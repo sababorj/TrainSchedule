@@ -1,0 +1,32 @@
+header{
+    background-color: darkslategrey;
+    color: whitesmoke;
+    margin: 0px 50px 20px 50px;
+    text-align: center;
+    height: 35%;
+}
+h1{
+    padding-top: 25px;
+}
+#funmsg{
+    padding-bottom: 10px;
+}
+.myTable, .myForm {
+    margin: 0px 50px 20px 50px;
+    border:1px solid darkslategray;
+}
+#titleHeader, #formTitle{
+    background-color: darkslategray;
+    color: whitesmoke;
+    padding: 5px 5px 5px 5px;
+}
+button {
+    margin: 5px;
+    font-size: 12px
+}
+form {
+    margin: 20px 20px 10px 20px;
+}
+#subbtn {
+    background-color: darkslategrey; 
+}
