@@ -16,13 +16,14 @@ var database = firebase.database();
 function render(arr) {
     $("#displayTable").empty()
     for (var i = 0; i < arr.length; i++) {
-        var newtr = $("<tr>");
+        var newtr = $(`<tr id="${arr[i].tkey}">`);
         newtr.append(`<td>${arr[i].tname}</td>`);
         newtr.append(`<td>${arr[i].tdes}</td>`);
         newtr.append(`<td>${arr[i].tfreq}</td>`);
         newtr.append(`<td>${arr[i].tnext}</td>`);
         newtr.append(`<td>${arr[i].taway}</td>`);
-        newtr.append('<td><button>remove</button><button>update</button></td>')
+        var StringData = JSON.stringify(arr[i]) 
+        newtr.append(`<td><button class="delete" id=${arr[i].tkey}>remove</button><button class="edit" data-user="${StringData}" hidden>update</button></td>`)
         $("#displayTable").append(newtr);
     }
 }
@@ -61,7 +62,7 @@ $(document).on("click", "#subbtn", function (event) {
     // if data is acceptable store it in database
     if (name !== false && city !== false && first !== false && freq !== false) {
         $("input").val(null);
-        database.ref("train").push({
+        database.ref("/train").push({
             name: name,
             destination: city,
             firstArrive: first,
@@ -84,13 +85,14 @@ function callcuteArriveTime(first, freq) {
 
 var trainArray = [];
 // on childadded event calculate time,clear the table and render it again
-database.ref("train").on("child_added", function (snapshot) {
+database.ref("/train").on("child_added", function (snapshot) {
     var trainMinAway = callcuteArriveTime(snapshot.val().firstArrive, snapshot.val().frequency).minAway;
     var trainNextArrive = callcuteArriveTime(snapshot.val().firstArrive, snapshot.val().frequency).nextArrive;
     console.log(trainMinAway, trainNextArrive);
     var TrainName = snapshot.val().name;
     var TrainFrequeny = snapshot.val().frequency;
     var TrainDestination = snapshot.val().destination;
+    var TrainKey = snapshot.key;
 
     // construct the train object
     var trainObj = {
@@ -98,12 +100,27 @@ database.ref("train").on("child_added", function (snapshot) {
         tname: TrainName,
         tfreq: TrainFrequeny,
         tnext: trainNextArrive,
-        taway: trainMinAway
+        taway: trainMinAway,
+        tkey: TrainKey
     }
     // push it to trainArray
     trainArray.push(trainObj);
     render(trainArray);
 })
 // on remove btn remove from database and render the table again 
+$(document).on("click", ".delete", function(e) {
+    // get the ID and remove it from database
+    e.preventDefault();
+    var deleteKey = $(this).attr("id");
+    database.ref(`/train/${deleteKey}`).remove();
+    // remove the row from the table
+    $(`#${deleteKey}`).remove();
+    localStorage.clear();
+})
 
 // on update data removes from database, fill the form with previour data, render table again
+$(document).on("click",".edit", function(e){
+    e.preventDefault();
+    var snapObject = JSON.parse($(this).attr("data-user"));
+    console.log(data_obj)
+})

@@ -35,3 +35,14 @@ form {
     color: red;
     font-weight: bold;
 }
+.delete{
+    font-weight: bold;
+    background-color: lightcoral;
+    border:1px solid red
+}
+.edit{
+   
+    font-weight: bold;
+    background-color: royalblue;
+    border:1px solid blue
+}
