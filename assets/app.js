@@ -58,38 +58,52 @@ $(document).on("click", "#subbtn", function (event) {
         var freq = false;
     }
 
-    // constract the data about the train
+    // if data is acceptable store it in database
     if (name !== false && city !== false && first !== false && freq !== false) {
         $("input").val(null);
-        database.ref().push({
+        database.ref("train").push({
             name: name,
             destination: city,
             firstArrive: first,
             frequency: freq
         })
     }
+})
 
-    // on childadded event clear the table and render it again
-    // for each
-    // function to calculations time
-   function callcuteArriveTime (first,freq){
+// function to calculations time
+function callcuteArriveTime(first, freq) {
     var firstMoment = moment(first, "HHmm");
     var firstTimeConverted = firstMoment.subtract(1, "years");
-    console.log(firstTimeConverted)
     var diffTime = moment().diff(firstTimeConverted, "minutes");
     var tRemainder = diffTime % freq;
     var tMinutesTillTrain = freq - tRemainder;
     var NextArrival = moment().add(tMinutesTillTrain, "minutes");
     var ArrTime = moment(NextArrival).format("hh:mm");
-    return { minAway : tMinutesTillTrain, nextArrive : ArrTime}
-   }
-    console.log(callcuteArriveTime("0936",10).minAway)
+    return { minAway: tMinutesTillTrain, nextArrive: ArrTime }
+}
 
+var trainArray = [];
+// on childadded event calculate time,clear the table and render it again
+database.ref("train").on("child_added", function (snapshot) {
+    var trainMinAway = callcuteArriveTime(snapshot.val().firstArrive, snapshot.val().frequency).minAway;
+    var trainNextArrive = callcuteArriveTime(snapshot.val().firstArrive, snapshot.val().frequency).nextArrive;
+    console.log(trainMinAway, trainNextArrive);
+    var TrainName = snapshot.val().name;
+    var TrainFrequeny = snapshot.val().frequency;
+    var TrainDestination = snapshot.val().destination;
+
+    // construct the train object
+    var trainObj = {
+        tdes: TrainDestination,
+        tname: TrainName,
+        tfreq: TrainFrequeny,
+        tnext: trainNextArrive,
+        taway: trainMinAway
+    }
+    // push it to trainArray
+    trainArray.push(trainObj);
+    render(trainArray);
 })
+// on remove btn remove from database and render the table again 
 
-
-
-
-  // on remove btn remove from database and render the table again 
-
-  // on update data removes from database, fill the form with previour data, render table again
+// on update data removes from database, fill the form with previour data, render table again
